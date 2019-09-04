@@ -1,8 +1,8 @@
 from typing import List
 
 
-def has_duplicates(lst: List):
-    return len(lst) != len(set(lst))
+def has_duplicate(lst: List):
+    return count_duplicates(lst) > 0
 
 
 def count_duplicates(lst: List):
@@ -37,10 +37,13 @@ class HitAndBlow:
         elif input_ == "A":
             return "Correct answer is {}".format(self._correct_answer)
         elif input_.isnumeric() and len(input_) == self._len_answer:
-            score_ = self.score(int(input_))
-            self.count_tries += 1
-            self.is_over = (score_ == "4H0B")
-            return score_
+            if has_duplicate(input_):
+                return "Don't duplicate numbers."
+            else:
+                score_ = self.score(int(input_))
+                self.count_tries += 1
+                self.is_over = (score_ == "4H0B")
+                return score_
         else:
             return "Input {}-digit number.".format(self._len_answer)
 
