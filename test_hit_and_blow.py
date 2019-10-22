@@ -15,14 +15,21 @@ class TestDefDuplicates(unittest.TestCase):
 
 
 class TestHitAndBlow(unittest.TestCase):
-    def test_score(self):
-        self.game = HitAndBlow(1234)
-        expect = "1H1B"
-        actual = self.game.score(1389)
-        self.assertEqual(expect, actual)
 
     def test_answer(self):
-        self.game = HitAndBlow(1234)
-        expect = "0H4B"
-        actual = self.game.answer("4321")
-        self.assertEqual(expect, actual)
+        game = HitAndBlow(4, 1234)
+
+        self.assertEqual("[1]0H4B", game.answer("4321"))
+        self.assertEqual(False, game.is_over)
+
+        self.assertEqual("[2]1H1B", game.answer("1389"))
+        self.assertEqual(False, game.is_over)
+
+        self.assertEqual("[3]4H0B", game.answer("1234"))
+        self.assertEqual(True, game.is_over)
+
+        with self.assertRaises(HitAndBlow.LengthError):
+            HitAndBlow(4, 12345)
+
+        with self.assertRaises(HitAndBlow.DuplicationError):
+            HitAndBlow(4, 1233)
