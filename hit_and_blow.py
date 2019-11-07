@@ -27,7 +27,7 @@ class HitAndBlow:
         self._hit = 0
         self._blow = 0
         self._is_over = False
-        self._answers = []
+        self._stored_answers = []
         # answer
         if correct_answer:
             self._valid_answer(str(correct_answer))
@@ -37,17 +37,21 @@ class HitAndBlow:
 
     @staticmethod
     def _get_numbers_list(min_: int, max_: int):
-        if min_ < max_ and {min_, max_} <= set(range(0, 10)):  # 部分集合か?
-            return [str(n) for n in range(min_, max_ + 1)]
-        else:
+        if min_ == max_:
+            raise ValueError("min = max")
+        elif min_ > max_:
+            raise ValueError("min > max")
+        elif {min_, max_}.isdisjoint(set(range(0, 10))):  # 1桁の数値か？
             raise ValueError()
+        else:
+            return [str(n) for n in range(min_, max_ + 1)]
 
     def _generate_answer(self) -> List:
         import random
         if self._allows_duplicate:
-            fn = random.sample
-        else:
             fn = random.choices
+        else:
+            fn = random.sample
         return fn(self._1_digit_numbers, k=self._len_answer)
 
     def _score(self, answer_: str):
@@ -55,7 +59,7 @@ class HitAndBlow:
         self._hit = len([i for i, j in zip(list(answer_), self._correct_answer) if i == j])
         self._blow = count_duplicates(list(answer_) + self._correct_answer) - self._hit
         self._is_over = (self._hit == self._len_answer)
-        self._answers.append(answer_)
+        self._stored_answers.append(answer_)
 
     @property
     def is_over(self):
@@ -73,7 +77,7 @@ class HitAndBlow:
         input_ = input_.upper()
         try:
             self._score(input_)
-            return "[{2}]{0}H{1}B".format(self._hit, self._blow, len(self._answers))
+            return "[{2}]{0}H{1}B".format(self._hit, self._blow, len(self._stored_answers))
         except self.DuplicationError:
             return "Please enter a unique number."
         except (self.NotNumericError, self.LengthError):
